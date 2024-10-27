@@ -1,0 +1,4 @@
+﻿cx_Oracle
+datetime
+logzero
+socket
