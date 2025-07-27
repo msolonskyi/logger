@@ -1,6 +1,6 @@
 from .constants import CONNECTION_STRING, RECONNECT_IN_MIN
 import datetime
-import cx_Oracle
+import oracledb
 import logzero
 import socket
 
@@ -47,7 +47,7 @@ class Logger(object):
             
     def _re_connect_to_db(self):
         if self._last_connected_time < datetime.datetime.now() - datetime.timedelta(minutes=RECONNECT_IN_MIN):
-            self.con = cx_Oracle.connect(CONNECTION_STRING, encoding="UTF-8")
+            self.con = oracledb.connect(CONNECTION_STRING)
             logzero.logger.info('(re)connected to DB.')
             self._last_connected_time = datetime.datetime.now()
 
@@ -56,7 +56,7 @@ class Logger(object):
         try:
             self._re_connect_to_db()
             cur = self.con.cursor()
-            out_value = cur.var(cx_Oracle.NUMBER)
+            out_value = cur.var(oracledb.NUMBER)
             cur.callproc('logger.pkg_log.sp_start_batch', [module, socket.gethostname(), parameters, out_value])
             batch_id = int(out_value.getvalue())
         finally:
